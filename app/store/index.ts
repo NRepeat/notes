@@ -1,28 +1,93 @@
+import { NotebookTabs } from "lucide-react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { Composite } from "~/entity/Composite";
+import { Leaf } from "~/entity/Leaf";
+import { Component, type SideBarData, type SideBarItem } from "~/types";
 
 type State = {
-  count: number;
+  categories: Composite;
+  getSideBarData: () => SideBarData;
   g: any;
 };
 
 type Actions = {
-  increment: (qty: number) => void;
-  decrement: (qty: number) => void;
+  getCategories: () => Composite;
+  addCategory: (tree: Composite) => void;
+};
+
+const reviver = (key: string, value: any): any => {
+  if (value.type === "Composite") {
+    const composite = new Composite(value.name || "");
+    if (value.children && Array.isArray(value.children)) {
+      value.children.forEach((childJson: any) => {
+        composite.add(childJson);
+      });
+    }
+    return composite;
+  }
+  if (value.type === "Leaf") {
+    return new Leaf(value.name || "");
+  }
+  return value;
 };
 
 export const useBearStore = create<Actions & State>()(
   persist(
-    immer((set) => ({
-      count: 0,
+    immer((set, get) => ({
+      getSideBarData: () => {
+        const categories = get().categories;
+        const data = categories.getChildren().map((category) => {
+          let subItems: SideBarItem[] | [] = [];
+          if (category.isComposite()) {
+            subItems = category.getChildren().map((subItem) => ({
+              title: subItem.name,
+              url: "c/" + category.name + "/n/" + subItem.name,
+              icon: NotebookTabs,
+              isActive: false,
+            }));
+          }
+          return {
+            title: category.name,
+            url: category.name,
+            icon: NotebookTabs,
+            items: subItems,
+            isActive: false,
+          };
+        });
+        return data;
+      },
+      categories: new Composite(),
       g: {},
-      increment: (qty) => set((state) => ({ count: state.count + qty })),
-      decrement: (qty) => set((state) => ({ count: state.count - qty })),
+
+      getCategories: () => {
+        return get().categories;
+      },
+
+      addCategory: (tree: Composite) =>
+        set((state) => {
+          state.categories = tree;
+        }),
     })),
     {
       name: "notes-storage",
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage, {
+        replacer: (key, value, seen = new WeakSet()) => {
+          if (value && typeof value === "object" && !Array.isArray(value)) {
+            if (seen.has(value)) {
+              return undefined;
+            }
+            seen.add(value);
+          }
+
+          if (value instanceof Component) {
+            return value.toJSON();
+          }
+          return value;
+        },
+        reviver,
+      }),
     }
   )
 );

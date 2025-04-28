@@ -4,6 +4,7 @@ import { immer } from "zustand/middleware/immer";
 
 type State = {
   count: number;
+  g: any;
 };
 
 type Actions = {
@@ -15,6 +16,7 @@ export const useBearStore = create<Actions & State>()(
   persist(
     immer((set) => ({
       count: 0,
+      g: {},
       increment: (qty) => set((state) => ({ count: state.count + qty })),
       decrement: (qty) => set((state) => ({ count: state.count - qty })),
     })),

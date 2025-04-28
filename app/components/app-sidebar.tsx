@@ -34,7 +34,7 @@ import {
 } from "./ui/collapsible";
 import { useBearStore } from "~/store";
 import { Component } from "~/types";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 // Menu items.
 const data = {
@@ -66,6 +66,7 @@ const data = {
 export function AppSidebar() {
   const state = useBearStore((state) => state);
   const data = state.getSideBarData();
+  const nav = useNavigate();
   console.log("data", data);
   return (
     <Sidebar>
@@ -83,7 +84,14 @@ export function AppSidebar() {
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton tooltip={item.title}>
+                      <SidebarMenuButton
+                        tooltip={item.title}
+                        onClick={() =>
+                          item.items && item.items.length === 0
+                            ? nav(item.url || "")
+                            : undefined
+                        }
+                      >
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
                         {item.items && item.items.length > 0 && (

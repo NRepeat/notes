@@ -9,7 +9,6 @@ import { Component, type SideBarData, type SideBarItem } from "~/types";
 type State = {
   categories: Composite;
   getSideBarData: () => SideBarData;
-  g: any;
 };
 
 type Actions = {
@@ -32,42 +31,53 @@ const reviver = (key: string, value: any): any => {
   }
   return value;
 };
-
+const getSideBarData = (categories: Composite) => {
+  const data = categories.getChildren().map((category) => {
+    console.log("category", category);
+    let subItems: SideBarItem[] | [] = [];
+    if (category.isComposite()) {
+      subItems = category.getChildren().map((subItem) => ({
+        title: subItem.name,
+        url: "c/" + category.name + "/n/" + subItem.name,
+        icon: NotebookTabs,
+        isActive: false,
+      }));
+    }
+    return {
+      title: category.name,
+      url:
+        category instanceof Composite
+          ? "c/" + category.name
+          : "n/" + category.name,
+      icon: NotebookTabs,
+      items: subItems,
+      isActive: false,
+    };
+  });
+  return data;
+};
 export const useBearStore = create<Actions & State>()(
   persist(
     immer((set, get) => ({
-      getSideBarData: () => {
-        const categories = get().categories;
-        const data = categories.getChildren().map((category) => {
-          let subItems: SideBarItem[] | [] = [];
-          if (category.isComposite()) {
-            subItems = category.getChildren().map((subItem) => ({
-              title: subItem.name,
-              url: "c/" + category.name + "/n/" + subItem.name,
-              icon: NotebookTabs,
-              isActive: false,
-            }));
-          }
-          return {
-            title: category.name,
-            url: category.name,
-            icon: NotebookTabs,
-            items: subItems,
-            isActive: false,
-          };
-        });
-        return data;
-      },
+      getSideBarData: () => getSideBarData(get().categories),
       categories: new Composite(),
-      g: {},
-
-      getCategories: () => {
-        return get().categories;
-      },
-
+      getCategories: () => get().categories,
       addCategory: (tree: Composite) =>
         set((state) => {
-          state.categories = tree;
+          state.categories = tree; // Обновляем categories
+        }),
+      addNote: (note: Leaf) =>
+        set((draft) => {
+          // Создаем новый Composite для иммутабельности
+          const newCategories = new Composite(draft.categories.name);
+          // Копируем существующие дочерние элементы
+          draft.categories.getChildren().forEach((child) => {
+            newCategories.add(child);
+          });
+          // Добавляем новую заметку
+          newCategories.add(note);
+          // Обновляем черновик стейта
+          draft.categories = newCategories;
         }),
     })),
     {

@@ -1,5 +1,9 @@
 import { Link, Outlet } from "react-router";
 import type { Route } from "../+types/root";
+import { useBearStore } from "~/store";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Leaf } from "~/entity/Leaf";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,17 +13,21 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const state = useBearStore((state) => state);
+  const [value, setValue] = useState<string>();
+  const handleAddNote = () => {
+    const note = new Leaf(value!);
+    state.getCategories().add(note);
+    state.addCategory(state.categories);
+  };
   return (
     <>
-      hi
-      <ul>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/about">About</Link>
-        </li>
-      </ul>
+      <input
+        type="text"
+        onChange={(e) => setValue(e.target.value)}
+        value={value}
+      />
+      <Button onClick={handleAddNote}>Add note</Button>
       <Outlet />
     </>
   );

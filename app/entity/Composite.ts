@@ -2,18 +2,24 @@ import { Component } from "~/types";
 import { Leaf } from "./Leaf";
 
 export class Composite extends Component {
+  public new = false;
   protected children: Component[] = [];
   public name: string;
-  constructor(name?: string) {
+  constructor(name?: string, newCategory?: boolean) {
     super();
-
-    this.name = name || "index";
+    this.new = newCategory || false;
+    this.name = name || "";
+  }
+  public operation(): string {
+    throw new Error("Method not implemented.");
   }
   public add(component: Component): void {
     this.children.push(component);
     component.setParent(this);
   }
-
+  public setNew(newValue: boolean): void {
+    this.new = newValue;
+  }
   public remove(component: Component): void {
     const componentIndex = this.children.indexOf(component);
     this.children.splice(componentIndex, 1);
@@ -26,14 +32,17 @@ export class Composite extends Component {
   public isComposite(): boolean {
     return true;
   }
-
-  public operation(): string {
-    const results = [];
-    for (const child of this.children) {
-      results.push(child.operation());
-    }
-    return `Branch(${this.name}_${results.join("+")})`;
+  public updateName(name: string): void {
+    this.name = name;
   }
+
+  // public operation(): string {
+  //   const results = [];
+  //   for (const child of this.children) {
+  //     results.push(child.operation());
+  //   }
+  //   return `Branch(${this.name}_${results.join("+")})`;
+  // }
 
   // Add the toJSON method to handle serialization
   public toJSON(): any {

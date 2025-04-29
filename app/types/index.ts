@@ -4,8 +4,12 @@ import type React from "react";
 export abstract class Component {
   protected parent!: Component | null;
   public name!: string;
+  public new!: boolean;
   public setParent(parent: Component | null): void {
     this.parent = parent;
+  }
+  public setNew(newValue: boolean): void {
+    this.new = newValue;
   }
   public getName(): string {
     return this.name;
@@ -15,7 +19,9 @@ export abstract class Component {
   }
 
   public add(component: Component): void {}
-
+  public updateName(name: string): void {
+    this.name = name;
+  }
   public remove(component: Component): void {}
   public getChildren(): Component[] {
     return [];
@@ -46,6 +52,7 @@ export type SideBarItem = {
   items?: SideBarItem[];
   onClick?: () => void;
   isDisabled?: boolean;
+  isNew?: boolean;
   isExternal?: boolean;
   isHidden?: boolean;
 };

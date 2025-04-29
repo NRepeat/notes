@@ -3,6 +3,7 @@ import { SidebarTrigger } from "./sidebar";
 import { Separator } from "./separator";
 import { Button } from "./button";
 import { useBearStore } from "~/store";
+import CreateFolder from "../createFolder";
 
 const Header = () => {
   const state = useBearStore((state) => state);
@@ -12,6 +13,7 @@ const Header = () => {
         <SidebarTrigger />
         <Separator orientation="vertical" className="mr-2 h-4" />
       </div>
+      <CreateFolder />
       <Button
         onClick={() => state.setCreateNoteModalOpen(!state.createNoteModalOpen)}
       >

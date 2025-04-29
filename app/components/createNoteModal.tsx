@@ -21,7 +21,6 @@ const CreateNoteModal = () => {
       switch (newState.type) {
         case "addEmptyCategory": {
           const newCategoryList = [...prevState.category, ""];
-          console.log("newCategory", newCategoryList);
           return {
             ...prevState,
             category: newCategoryList,
@@ -35,8 +34,12 @@ const CreateNoteModal = () => {
           };
         }
         case "addCategory": {
-          const newCategoryList = [...prevState.category, newState.category];
-          console.log("newCategory", newCategoryList);
+          const newCategoryList = prevState.category.map((category, index) => {
+            if (index === newState.index) {
+              return newState.category;
+            }
+            return category;
+          });
           return {
             ...prevState,
             category: newCategoryList,
@@ -50,7 +53,6 @@ const CreateNoteModal = () => {
 
             return category;
           });
-          console.log("newCategory", newCategoryList);
           return {
             ...prevState,
             category: newCategoryList,
@@ -66,7 +68,6 @@ const CreateNoteModal = () => {
           const newCategoryList = prevState.category.filter(
             (category: string, index: number) => index !== newState.index
           );
-          console.log("newCategory", newCategoryList);
           return {
             ...prevState,
             category: newCategoryList,
@@ -85,6 +86,7 @@ const CreateNoteModal = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ [e.target.name]: e.target.value });
   };
+  console.log("formState", formState);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formState.category) {

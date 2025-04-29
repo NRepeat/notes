@@ -1,7 +1,6 @@
-import { NotebookTabs } from "lucide-react";
+import { LeafIcon, NotebookTabs } from "lucide-react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
 import { Composite } from "~/entity/Composite";
 import { Leaf } from "~/entity/Leaf";
 import { Component, type SideBarData, type SideBarItem } from "~/types";
@@ -17,7 +16,11 @@ type Actions = {
   getCategoriesNames: () => string[];
   getCategories: () => Composite;
   addNote: (note: string, category?: string[]) => void;
-  addCategory: (value: string) => void;
+  addCategory: (
+    value: string,
+    subCategory?: string,
+    newCategory?: boolean
+  ) => void;
 };
 
 const reviver = (key: string, value: any): any => {
@@ -50,14 +53,14 @@ const getCategoriesNames = (categories: Composite) => {
 };
 const getSideBarData = (categories: Composite) => {
   const data = categories.getChildren().map((category) => {
-    console.log("category", category);
     let subItems: SideBarItem[] | [] = [];
     if (category.isComposite()) {
       subItems = category.getChildren().map((subItem) => ({
         title: subItem.name,
         url: "c/" + category.name + "/n/" + subItem.name,
-        icon: NotebookTabs,
+        icon: subItem.isComposite() ? NotebookTabs : LeafIcon,
         isActive: false,
+        isNew: subItem.new,
       }));
     }
     return {
@@ -66,9 +69,10 @@ const getSideBarData = (categories: Composite) => {
         category instanceof Composite
           ? "c/" + category.name
           : "n/" + category.name,
-      icon: NotebookTabs,
+      icon: category instanceof Composite ? NotebookTabs : LeafIcon,
       items: subItems,
       isActive: false,
+      isNew: category.new,
     };
   });
   return data;
@@ -85,12 +89,20 @@ export const useBearStore = create<Actions & State>()(
       createNoteModalOpen: false,
       getCategories: () => get().categories,
       getSideBarData: () => getSideBarData(get().categories),
-      addCategory: (value: string) =>
+      addCategory: (
+        value: string,
+        subCategoryValue?: string | undefined,
+        newCategory?: boolean
+      ) =>
         set((state) => {
-          console.log("value", value);
-          const newCategories = new Composite(value);
-          state.categories.add(newCategories);
-          console.log("state.categories", state.categories);
+          if (subCategoryValue && newCategory) {
+            const newCategories = new Composite(value, newCategory);
+            const subCategory = state.categories.find(subCategoryValue);
+            subCategory?.add(newCategories);
+          } else if (!newCategory) {
+            const newCategories = new Composite(value);
+            state.categories.add(newCategories);
+          }
           return {
             ...state,
             categories: state.categories,
@@ -99,7 +111,8 @@ export const useBearStore = create<Actions & State>()(
       addNote: (note: string, category?: string[]) =>
         set((state) => {
           const newNote = new Leaf(note);
-          if (category && category.length > 0) {
+
+          if (category && category.length > 0 && category[0] !== "") {
             category.forEach((cat) => {
               const c = state.categories.find(cat);
               if (c) {
@@ -107,6 +120,7 @@ export const useBearStore = create<Actions & State>()(
               }
             });
           } else {
+            console.log("newNote", newNote);
             state.categories.add(newNote);
           }
           return {

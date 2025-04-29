@@ -35,7 +35,6 @@ const CategoryFormSearch = ({
     setFormState({ type: "changeCategory", category: value, index: index });
   };
   const clearCategory = () => {
-    console.log("clearCategory");
     setFormState({ type: "clearCategory", index: index });
   };
   const handleCategoryAdd = () => {

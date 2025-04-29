@@ -13,13 +13,6 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const state = useBearStore((state) => state);
-  const [value, setValue] = useState<string>();
-  const handleAddNote = () => {
-    const note = new Leaf(value!);
-    state.getCategories().add(note);
-    state.addCategory(state.categories);
-  };
   return (
     <>
       <Outlet />

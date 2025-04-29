@@ -17,10 +17,9 @@ import {
 } from "../ui/breadcrumb";
 import Header from "../ui/header";
 import CreateNoteModal from "../createNoteModal";
+import g from "~/store/global";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const state = useBearStore((state) => state);
-
   return (
     <html lang="en">
       <head>

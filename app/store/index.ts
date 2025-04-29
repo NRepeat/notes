@@ -8,12 +8,16 @@ import { Component, type SideBarData, type SideBarItem } from "~/types";
 
 type State = {
   categories: Composite;
+  createNoteModalOpen: boolean;
+  setCreateNoteModalOpen: (open: boolean) => void;
   getSideBarData: () => SideBarData;
 };
 
 type Actions = {
+  getCategoriesNames: () => string[];
   getCategories: () => Composite;
-  addCategory: (tree: Composite) => void;
+  addNote: (note: string, category?: string[]) => void;
+  addCategory: (value: string) => void;
 };
 
 const reviver = (key: string, value: any): any => {
@@ -30,6 +34,19 @@ const reviver = (key: string, value: any): any => {
     return new Leaf(value.name || "");
   }
   return value;
+};
+const getCategoriesNames = (categories: Composite) => {
+  const names = categories
+    .getChildren()
+    .map((category) => {
+      if (category.isComposite()) {
+        return category.name;
+      }
+      return null;
+    })
+    .filter((name) => name !== null);
+
+  return names;
 };
 const getSideBarData = (categories: Composite) => {
   const data = categories.getChildren().map((category) => {
@@ -58,28 +75,47 @@ const getSideBarData = (categories: Composite) => {
 };
 export const useBearStore = create<Actions & State>()(
   persist(
-    immer((set, get) => ({
-      getSideBarData: () => getSideBarData(get().categories),
-      categories: new Composite(),
+    (set, get) => ({
+      categories: new Composite("root"),
+      setCreateNoteModalOpen: (open: boolean) =>
+        set((state) => ({
+          ...state,
+          createNoteModalOpen: open,
+        })),
+      createNoteModalOpen: false,
       getCategories: () => get().categories,
-      addCategory: (tree: Composite) =>
+      getSideBarData: () => getSideBarData(get().categories),
+      addCategory: (value: string) =>
         set((state) => {
-          state.categories = tree; // Обновляем categories
+          console.log("value", value);
+          const newCategories = new Composite(value);
+          state.categories.add(newCategories);
+          console.log("state.categories", state.categories);
+          return {
+            ...state,
+            categories: state.categories,
+          };
         }),
-      addNote: (note: Leaf) =>
-        set((draft) => {
-          // Создаем новый Composite для иммутабельности
-          const newCategories = new Composite(draft.categories.name);
-          // Копируем существующие дочерние элементы
-          draft.categories.getChildren().forEach((child) => {
-            newCategories.add(child);
-          });
-          // Добавляем новую заметку
-          newCategories.add(note);
-          // Обновляем черновик стейта
-          draft.categories = newCategories;
+      addNote: (note: string, category?: string[]) =>
+        set((state) => {
+          const newNote = new Leaf(note);
+          if (category && category.length > 0) {
+            category.forEach((cat) => {
+              const c = state.categories.find(cat);
+              if (c) {
+                c.add(newNote);
+              }
+            });
+          } else {
+            state.categories.add(newNote);
+          }
+          return {
+            ...state,
+            categories: state.categories,
+          };
         }),
-    })),
+      getCategoriesNames: () => getCategoriesNames(get().categories),
+    }),
     {
       name: "notes-storage",
       storage: createJSONStorage(() => localStorage, {

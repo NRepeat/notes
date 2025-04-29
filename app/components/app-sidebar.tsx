@@ -8,6 +8,7 @@ import {
   GalleryVerticalEnd,
   Home,
   Inbox,
+  Plus,
   Search,
   Settings,
   Settings2,
@@ -37,31 +38,6 @@ import { Component } from "~/types";
 import { Link, useNavigate } from "react-router";
 
 // Menu items.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [],
-};
 
 export function AppSidebar() {
   const state = useBearStore((state) => state);
@@ -94,6 +70,7 @@ export function AppSidebar() {
                       >
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
+                        <Plus />
                         {item.items && item.items.length > 0 && (
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         )}

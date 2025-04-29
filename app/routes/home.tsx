@@ -22,12 +22,6 @@ export default function Home() {
   };
   return (
     <>
-      <input
-        type="text"
-        onChange={(e) => setValue(e.target.value)}
-        value={value}
-      />
-      <Button onClick={handleAddNote}>Add note</Button>
       <Outlet />
     </>
   );

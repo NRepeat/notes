@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Links, Meta, Scripts, ScrollRestoration } from "react-router";
-import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import { Button } from "../ui/button";
 import { AppSidebar } from "../app-sidebar";
 import { Leaf } from "~/entity/Leaf";
 import { Composite } from "~/entity/Composite";
 import { useBearStore } from "~/store";
+import { Separator } from "../ui/separator";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../ui/breadcrumb";
+import Header from "../ui/header";
+import CreateNoteModal from "../createNoteModal";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const state = useBearStore((state) => state);
@@ -21,10 +32,15 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       <body className="dark">
         <SidebarProvider>
           <AppSidebar />
-          <main>
-            <SidebarTrigger />
-            {children}
-          </main>
+          <SidebarInset>
+            <Header />
+            <div className="flex flex-1 flex-col gap-4 p-4">
+              <main className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
+                {children}
+              </main>
+              <CreateNoteModal />
+            </div>
+          </SidebarInset>
         </SidebarProvider>
         <ScrollRestoration />
         <Scripts />

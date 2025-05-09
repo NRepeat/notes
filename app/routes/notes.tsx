@@ -32,6 +32,7 @@ export default function Component({ params }: Route.ComponentProps) {
   };
   const handleSaveNoteValue = (value: string) => {
     note.updateValue(value);
+    updateNote(noteName,note);
   };
   const [value, setValue] = React.useState(handleGetNote() || mkdStr);
 
@@ -39,16 +40,12 @@ export default function Component({ params }: Route.ComponentProps) {
     note.updateValue(value);
     updateNote(noteName,note);
   };
-  // useEffect(() => {
-  //   console.log("value", value);
-  //   handleSaveNoteValue(value);
-  // }, [value]);
+  useEffect(() => {
+    handleSaveNoteValue(value);
+  }, [value]);
   return (
-    <div className="h-fit">
-      <h1>Notes</h1>
-      <p>CAtegory ID: {params.categoryId}</p>
-      <p>Product ID: {params.notesId}</p>
-      <Button onClick={() => handleUpdateState()}>Save</Button>
+    <div className="h-full">
+      {/* <Button onClick={() => handleUpdateState()}>Save</Button> */}
       <MDEditor
         height={"100%"}
         value={value}

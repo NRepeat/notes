@@ -15,7 +15,9 @@ type State = {
 type Actions = {
   getCategoriesNames: () => string[];
   getCategories: () => Composite;
+  getNote: (noteName: string) => Component | null;
   addNote: (note: string, category?: string[]) => void;
+  updateNote: (note: string, value: Component) => void;
   addCategory: (
     value: string,
     subCategory?: string,
@@ -34,7 +36,7 @@ const reviver = (key: string, value: any): any => {
     return composite;
   }
   if (value.type === "Leaf") {
-    return new Leaf(value.name || "");
+    return new Leaf(value.name || "", value.value || "");
   }
   return value;
 };
@@ -80,6 +82,28 @@ const getSideBarData = (categories: Composite) => {
 export const useBearStore = create<Actions & State>()(
   persist(
     (set, get) => ({
+      updateNote: (note, value) => {
+        set((state) => {
+          const oldNote = state.categories.find(note);
+          if (oldNote) {
+            state.categories.updateChildren(oldNote, value);
+            console.log(state.categories, "state.categories");
+            return {
+              ...state,
+              categories: state.categories,
+            };
+          } else {
+            return {
+              ...state,
+              categories: state.categories,
+            };
+          }
+        });
+      },
+      getNote: (noteName) => {
+        const note = get().categories.find(noteName);
+        return note;
+      },
       categories: new Composite("root"),
       setCreateNoteModalOpen: (open: boolean) =>
         set((state) => ({
@@ -111,7 +135,6 @@ export const useBearStore = create<Actions & State>()(
       addNote: (note: string, category?: string[]) =>
         set((state) => {
           const newNote = new Leaf(note);
-
           if (category && category.length > 0 && category[0] !== "") {
             category.forEach((cat) => {
               const c = state.categories.find(cat);
@@ -120,7 +143,6 @@ export const useBearStore = create<Actions & State>()(
               }
             });
           } else {
-            console.log("newNote", newNote);
             state.categories.add(newNote);
           }
           return {

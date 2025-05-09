@@ -86,7 +86,6 @@ const CreateNoteModal = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ [e.target.name]: e.target.value });
   };
-  console.log("formState", formState);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formState.category) {

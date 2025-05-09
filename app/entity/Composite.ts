@@ -26,6 +26,23 @@ export class Composite extends Component {
 
     component.setParent(null);
   }
+  public updateChildren(component: Component, newComponent: Component): void {
+    const componentIndex = this.children.indexOf(component);
+    console.log('componentIndex',componentIndex)
+    if (componentIndex !== -1) {
+      newComponent.setParent(this);
+      console.log('newComponent',newComponent)
+      this.children[componentIndex] = newComponent;
+      console.log('this.children',this.children)
+      component.setParent(null);
+    } else {
+      for (const child of this.children) {
+        if (child instanceof Composite) {
+          child.updateChildren(component, newComponent);
+        }
+      }
+    }
+  }
   public getChildren(): Component[] {
     return this.children;
   }

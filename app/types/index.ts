@@ -3,6 +3,7 @@ import type React from "react";
 
 export abstract class Component {
   protected parent!: Component | null;
+  public value!:string | null
   public name!: string;
   public new!: boolean;
   public setParent(parent: Component | null): void {
@@ -17,10 +18,17 @@ export abstract class Component {
   public getParent(): Component | null {
     return this.parent;
   }
-
+  public getValue():string | null { 
+    return this.value
+  }
+  
   public add(component: Component): void {}
+  public updateChildren(component: Component, newComponent: Component): void {}
   public updateName(name: string): void {
     this.name = name;
+  }
+  public updateValue(value: string): void {
+    this.value = value;
   }
   public remove(component: Component): void {}
   public getChildren(): Component[] {

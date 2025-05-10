@@ -39,6 +39,7 @@ import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import g from "~/store/global";
 import { Input } from "./ui/input";
+import DeleteCategory from "./ui/deleteCategory";
 
 // Menu items.
 
@@ -53,14 +54,12 @@ export function AppSidebar() {
     global.setOpenedFolder(item.title, item.url || "");
     item.items && item.items.length === 0 ? nav(item.url || "") : undefined;
   };
-  console.log("state", state);
   const [inputValue, setInputValue] = useState<string>("New Category");
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
   };
   const handleFocusEnd = () => {
-    console.log("inputValue", inputValue);
     const category = state.categories.find(global.openedFolder.title);
     if (category) {
       category.updateName(inputValue);
@@ -92,13 +91,16 @@ export function AppSidebar() {
                         tooltip={item.title}
                         onClick={() => handleFolderClock(item)}
                       >
-                        {item.icon && <item.icon />}
-                        <span>{item.title}</span>
+                        <DeleteCategory>
+                          <div className="flex items-center  gap-2">
+                            {item.icon && <item.icon />}
+                            <span>{item.title}</span>
+                          </div>
 
-                        <Plus />
-                        {item.items && item.items.length > 0 && (
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        )}
+                          {item.items && item.items.length > 0 && (
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          )}
+                        </DeleteCategory>
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     {item.items && item.items.length > 0 && (

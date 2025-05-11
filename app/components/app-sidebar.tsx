@@ -40,6 +40,7 @@ import { useState } from "react";
 import g from "~/store/global";
 import { Input } from "./ui/input";
 import DeleteCategory from "./ui/deleteCategory";
+import DeleteNote from "./ui/deleteNote";
 
 // Menu items.
 
@@ -48,7 +49,8 @@ export function AppSidebar() {
   const data = state.getSideBarData();
   const nav = useNavigate();
   const global = g((state) => state);
-
+  const [isNoteEdit, setIsNoteEdit] = useState({ name: "", edit: false });
+  console.log(isNoteEdit);
   // const [openedFolder, setOpenedFolder] = useState<string | null>(null);
   const handleFolderClock = (item: SideBarItem) => {
     global.setOpenedFolder(item.title, item.url || "");
@@ -108,18 +110,28 @@ export function AppSidebar() {
                         <SidebarMenuSub>
                           {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild>
-                                {subItem.isNew ? (
+                              <SidebarMenuSubButton>
+                                {subItem.isNew ||
+                                (isNoteEdit.name === subItem.title &&
+                                  isNoteEdit.edit) ? (
                                   <Input
                                     value={inputValue || subItem.title}
                                     onChange={handleInputChange}
                                     onBlur={handleFocusEnd}
                                   />
                                 ) : (
-                                  <Link to={subItem.url || ""}>
-                                    {subItem.icon && <subItem.icon />}
-                                    <span>{subItem.title}</span>
-                                  </Link>
+                                  <DeleteNote
+                                    note={subItem.title}
+                                    setIsEdit={setIsNoteEdit}
+                                  >
+                                    <Link
+                                      to={subItem.url || ""}
+                                      className="w-full flex items-center gap-2"
+                                    >
+                                      {subItem.icon && <subItem.icon />}
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </DeleteNote>
                                 )}
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>

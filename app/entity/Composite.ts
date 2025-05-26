@@ -5,6 +5,7 @@ export class Composite extends Component {
   public new = false;
   protected children: Component[] = [];
   public name: string;
+  public isFolder = true;
   constructor(name?: string, newCategory?: boolean) {
     super();
     this.new = newCategory || false;
@@ -17,23 +18,29 @@ export class Composite extends Component {
     this.children.push(component);
     component.setParent(this);
   }
-  public setNew(newValue: boolean): void {
-    this.new = newValue;
-  }
-  public remove(component: Component): void {
-    const componentIndex = this.children.indexOf(component);
-    this.children.splice(componentIndex, 1);
 
-    component.setParent(null);
+  public remove(component: Component): boolean {
+    const index = this.children.indexOf(component);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+      component.setParent(null);
+      return true;
+    }
+    for (const child of this.children) {
+      if (child instanceof Composite) {
+        if (child.remove(component)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
+
   public updateChildren(component: Component, newComponent: Component): void {
     const componentIndex = this.children.indexOf(component);
-    console.log('componentIndex',componentIndex)
     if (componentIndex !== -1) {
       newComponent.setParent(this);
-      console.log('newComponent',newComponent)
       this.children[componentIndex] = newComponent;
-      console.log('this.children',this.children)
       component.setParent(null);
     } else {
       for (const child of this.children) {
@@ -43,14 +50,21 @@ export class Composite extends Component {
       }
     }
   }
+
   public getChildren(): Component[] {
     return this.children;
   }
+
   public isComposite(): boolean {
     return true;
   }
+
   public updateName(name: string): void {
     this.name = name;
+  }
+
+  public setNew(newValue: boolean): void {
+    this.new = newValue;
   }
 
   // public operation(): string {
@@ -74,10 +88,9 @@ export class Composite extends Component {
       return this;
     }
     for (const child of this.children) {
-      if (child instanceof Leaf && (child as Leaf).getName() === name) {
+      if (child instanceof Leaf && child.getName() === name) {
         return child;
       }
-
       if (child instanceof Composite) {
         const found = child.find(name);
         if (found) return found;

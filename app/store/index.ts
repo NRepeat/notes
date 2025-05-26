@@ -16,6 +16,7 @@ type Actions = {
   getCategoriesNames: () => string[];
   getCategories: () => Composite;
   getNote: (noteName: string) => Component | null;
+  deleteNote: (note: string) => void;
   addNote: (note: string, category?: string[]) => void;
   updateNote: (note: string, value: Component) => void;
   addCategory: (
@@ -53,31 +54,34 @@ const getCategoriesNames = (categories: Composite) => {
 
   return names;
 };
-const getSideBarData = (categories: Composite) => {
-  const data = categories.getChildren().map((category) => {
-    let subItems: SideBarItem[] | [] = [];
-    if (category.isComposite()) {
-      subItems = category.getChildren().map((subItem) => ({
-        title: subItem.name,
-        url: "c/" + category.name + "/n/" + subItem.name,
-        icon: subItem.isComposite() ? NotebookTabs : LeafIcon,
-        isActive: false,
-        isNew: subItem.new,
-      }));
+const getSideBarData = (categories: Composite): SideBarData => {
+  // Recursive function to build the sidebar tree
+  const buildItems = (
+    node: Component,
+    parentCategoryName?: string
+  ): SideBarItem => {
+    const isFolder = node.isComposite();
+    const url = isFolder
+      ? `c/${node.name}`
+      : parentCategoryName
+      ? `c/${parentCategoryName}/n/${node.name}`
+      : `n/${node.name}`;
+    const icon = isFolder ? NotebookTabs : LeafIcon;
+    let items: SideBarItem[] = [];
+    if (isFolder) {
+      items = node.getChildren().map((child) => buildItems(child, node.name));
     }
     return {
-      title: category.name,
-      url:
-        category instanceof Composite
-          ? "c/" + category.name
-          : "n/" + category.name,
-      icon: category instanceof Composite ? NotebookTabs : LeafIcon,
-      items: subItems,
+      title: node.name,
+      isFolder,
+      url,
+      icon,
+      items: items.length > 0 ? items : undefined,
       isActive: false,
-      isNew: category.new,
+      isNew: node.new,
     };
-  });
-  return data;
+  };
+  return categories.getChildren().map((category) => buildItems(category));
 };
 export const useBearStore = create<Actions & State>()(
   persist(
@@ -144,6 +148,19 @@ export const useBearStore = create<Actions & State>()(
             });
           } else {
             state.categories.add(newNote);
+          }
+          return {
+            ...state,
+            categories: state.categories,
+          };
+        }),
+      deleteNote: (note: string) =>
+        set((state) => {
+          const noteToDelete = state.categories.find(note);
+          console.log("deleteNote", noteToDelete);
+
+          if (noteToDelete) {
+            state.categories.remove(noteToDelete);
           }
           return {
             ...state,

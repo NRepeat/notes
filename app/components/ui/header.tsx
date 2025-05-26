@@ -13,7 +13,7 @@ const Header = () => {
         <SidebarTrigger />
         <Separator orientation="vertical" className="mr-2 h-4" />
       </div>
-      <CreateFolder />
+      {/* <CreateFolder /> */}
       <Button
         onClick={() => state.setCreateNoteModalOpen(!state.createNoteModalOpen)}
       >

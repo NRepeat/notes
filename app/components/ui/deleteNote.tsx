@@ -20,14 +20,12 @@ const DeleteNote = ({
 }) => {
   const state = useBearStore((state) => state);
   const handleEditNote = () => {
-    const c = state.categories.find(note);
-    console.log(c);
+    // Find the note in the store
+    const c = state.getNote(note);
     if (!c) {
       throw new Error("Note not found");
     }
     setIsEdit({ edit: true, name: note });
-    // c.updateName()
-    // state.updateNote(note,c)
   };
   return (
     <ContextMenu>
@@ -39,7 +37,7 @@ const DeleteNote = ({
           <Edit />
           Rename
         </ContextMenuItem>
-        <ContextMenuItem>
+        <ContextMenuItem onClick={() => state.deleteNote(note)}>
           <Trash />
           Delete
         </ContextMenuItem>

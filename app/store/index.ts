@@ -41,18 +41,25 @@ const reviver = (key: string, value: any): any => {
   }
   return value;
 };
-const getCategoriesNames = (categories: Composite) => {
-  const names = categories
-    .getChildren()
-    .map((category) => {
-      if (category.isComposite()) {
-        return category.name;
-      }
-      return null;
-    })
-    .filter((name) => name !== null);
-
+const getCategoriesNames = (categories: Composite): string[] => {
+  const names: string[] = [];
+  const traverse = (node: Component) => {
+    if (node.isComposite()) {
+      names.push(node.name);
+      node.getChildren().forEach(traverse);
+    }
+  };
+  categories.getChildren().forEach(traverse);
   return names;
+};
+const getFullCategoryPath = (node: Component): string[] => {
+  const path: string[] = [];
+  let current: Component | null = node.getParent();
+  while (current && current.getParent()) {
+    path.unshift(current.name);
+    current = current.getParent();
+  }
+  return path;
 };
 const getSideBarData = (categories: Composite): SideBarData => {
   // Recursive function to build the sidebar tree
@@ -61,10 +68,11 @@ const getSideBarData = (categories: Composite): SideBarData => {
     parentCategoryName?: string
   ): SideBarItem => {
     const isFolder = node.isComposite();
+    const path = getFullCategoryPath(node);
     const url = isFolder
-      ? `c/${node.name}`
-      : parentCategoryName
-      ? `c/${parentCategoryName}/n/${node.name}`
+      ? `c/${[...path, node.name].join("/")}`
+      : path.length > 0
+      ? `c/${path.join("/")}/n/${node.name}`
       : `n/${node.name}`;
     const icon = isFolder ? NotebookTabs : LeafIcon;
     let items: SideBarItem[] = [];

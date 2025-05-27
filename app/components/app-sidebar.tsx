@@ -56,7 +56,7 @@ export function AppSidebar() {
     global.setOpenedFolder(item.title, item.url || "");
     item.items && item.items.length === 0 ? nav(item.url || "") : undefined;
   };
-  const [inputValue, setInputValue] = useState<string>("New Category");
+  const [inputValue, setInputValue] = useState<string>("");
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
@@ -91,7 +91,6 @@ export function AppSidebar() {
   // Recursive render function for nested sidebar items
   const renderSidebarItems = (items: SideBarItem[] = [], level: number = 0) => {
     return items.map((item, index) => {
-      console.log(item, "item");
       const hasChildren =
         item.isFolder || (item.items && item.items.length > 0);
       const isCategory = hasChildren;

@@ -15,17 +15,15 @@ const mkdStr = `
 
 `;
 export default function Component({ params }: Route.ComponentProps) {
-  // params["*"] будет содержать строку вида "dd/n/лолофвы" или "dd/New Folder/n/лолофвы"
-  const path = params["*"] || "";
-  const parts = path.split("/");
-  // Ищем индекс "n" (разделитель между папками и заметкой)
-  const nIndex = parts.lastIndexOf("n");
-  let categoryPath: string[] = [];
-  let noteName: string | undefined;
-  if (nIndex !== -1) {
-    categoryPath = parts.slice(0, nIndex); // все до "n" — это путь до папки
-    noteName = parts.slice(nIndex + 1).join("/"); // всё после "n" — имя заметки
-  }
+  console.log("params", params);
+  // Получаем путь до категории как массив (для вложенных папок)
+  const categoryPath = Array.isArray(params.category)
+    ? params.category
+    : params.category
+    ? params.category.split("/")
+    : [];
+  console.log("categoryPath", categoryPath);
+  const noteName = params.notesId;
   const getNote = useBearStore((state) => state.getNote);
   const updateNote = useBearStore((state) => state.updateNote);
 
@@ -52,7 +50,7 @@ export default function Component({ params }: Route.ComponentProps) {
           .getChildren()
           .find((n: any) => n.name === decodeURIComponent(noteName)) || null;
     }
-  } else if (noteName) {
+  } else {
     note = getNote(noteName);
   }
 
@@ -65,7 +63,7 @@ export default function Component({ params }: Route.ComponentProps) {
   useEffect(() => {
     setNote(note);
     setValue(note?.getValue() || "");
-  }, [params["*"], noteName]);
+  }, [params.category, noteName]);
 
   const handleSaveNoteValue = (value: string) => {
     if (!noteState) {

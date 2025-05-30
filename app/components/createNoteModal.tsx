@@ -113,13 +113,29 @@ const CreateNoteModal = () => {
     e.preventDefault();
     console.log(formState, "formState.tag");
     if (formState.category) {
-      state.addNote(formState.title, formState.category);
+      state.addNote(formState.title, formState.category, [
+        {
+          name: typeof formState.tag === "string" ? formState.tag : "",
+        },
+      ]);
     } else if (formState.category && formState.tag.length > 0) {
-      state.addNote(formState.title, formState.category, formState.tag);
+      state.addNote(formState.title, formState.category, [
+        {
+          name: typeof formState.tag === "string" ? formState.tag : "",
+        },
+      ]);
     } else if (formState.tag.length > 0) {
-      state.addNote(formState.title, [], formState.tag);
+      state.addNote(formState.title, formState.category, [
+        {
+          name: typeof formState.tag === "string" ? formState.tag : "",
+        },
+      ]);
     } else {
-      state.addNote(formState.title);
+      state.addNote(formState.title, formState.category, [
+        {
+          name: typeof formState.tag === "string" ? formState.tag : "",
+        },
+      ]);
     }
     state.setCreateNoteModalOpen(false);
     setFormState({

@@ -195,7 +195,7 @@ export const useBearStore = create<Actions & State>()(
         set((state) => {
           console.log("addNote", note, category, tags);
           const newNote = new Leaf(note);
-          if (tags && Array.isArray(tags)) {
+          if (tags && Array.isArray(tags) && tags.length > 0) {
             tags.forEach((tag) => {
               newNote.addTag({
                 name: tag.name,

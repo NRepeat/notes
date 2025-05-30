@@ -5,6 +5,7 @@ import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import { useBearStore } from "~/store";
 import type { Component as NoteComponent } from "~/types";
+import { Button } from "~/components/ui/button";
 const mkdStr = `
 # Markdown Editor
 
@@ -86,8 +87,9 @@ export default function Component({ params }: Route.ComponentProps) {
   useEffect(() => {
     handleSaveNoteValue(value);
   }, [value]);
-  console.log(note, "note");
   const getTagsWithCollor = () => {
+    console.log(note, "note-----");
+
     if (note) {
       return note?.getTags().length > 0
         ? note.getTags().map((tag) => {
@@ -104,6 +106,7 @@ export default function Component({ params }: Route.ComponentProps) {
         : null;
     }
   };
+  // const handleAddTag
   return (
     <div className="h-full">
       <div className="flex items-center justify-between p-2 border-b">

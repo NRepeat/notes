@@ -87,8 +87,30 @@ export default function Component({ params }: Route.ComponentProps) {
   useEffect(() => {
     handleSaveNoteValue(value);
   }, [value]);
+  const getTagsWithCollor = () => {
+    console.log(note, "note-----");
+
+    if (note) {
+      return note?.getTags().length > 0
+        ? note.getTags().map((tag) => {
+            return (
+              <span
+                key={tag.name}
+                className={`inline-block px-2 py-1 mr-2 text-xs font-semibold text-white rounded-full`}
+                style={{ backgroundColor: tag.color || "gray" }}
+              >
+                {tag.name}
+              </span>
+            );
+          })
+        : null;
+    }
+  };
   return (
     <div className="h-full">
+      <div className="flex items-center justify-between p-2 border-b">
+        {getTagsWithCollor()}
+      </div>
       <MDEditor
         height={"100%"}
         value={value}

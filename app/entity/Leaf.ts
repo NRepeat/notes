@@ -4,13 +4,17 @@ export class Leaf extends Component {
   public name: string;
   public value: string | null = null;
   public tags: { name: string; color: string }[] = [];
-  constructor(name: string, value?: string, tags?: string[]) {
+  constructor(name: string, value?: string, tags?: any[]) {
     super();
     this.name = name;
     this.value = value || "";
-    this.tags = Array.isArray(tags)
-      ? tags.map((tag) => ({ name: tag, color: "default" }))
-      : [];
+    if (Array.isArray(tags)) {
+      this.tags = tags.map((tag) =>
+        typeof tag === "string" ? { name: tag, color: "default" } : tag
+      );
+    } else {
+      this.tags = [];
+    }
   }
   public updateName(name: string): void {
     this.name = name;

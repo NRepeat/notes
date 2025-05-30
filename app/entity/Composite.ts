@@ -80,6 +80,7 @@ export class Composite extends Component {
     return {
       type: "Composite",
       name: this.name,
+      tags: this.getTags(),
       children: this.children,
     };
   }

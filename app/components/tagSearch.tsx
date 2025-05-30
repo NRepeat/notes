@@ -35,13 +35,14 @@ const TagFormSearch = ({
     setFormState({ tag: "" });
   };
   const handleTagAdd = () => {
-    // state.addTag(tagInputState.value);
-    setFormState({ tag: tagInputState.value });
+    state.addTag(formState.title, { name: tagInputState.value });
+    setFormState({ type: "addTag ", tag: tagInputState.value });
     setTagInputState({
       canAdd: false,
       value: "",
     });
   };
+  console.log(state.getTagsNames(), "state.getTagsNames()");
   const handleTagSearchChange = (value: string) => {
     const tagIndex = state.getTagsNames().findIndex((c) => c.name === value);
     if (tagIndex === -1) {

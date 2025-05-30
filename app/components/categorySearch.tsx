@@ -49,12 +49,10 @@ const CategoryFormSearch = ({
       value: "",
     });
   };
-  console.log(state.getCategoriesNames(), "categories");
   const handleCategorySearchChange = (value: string) => {
     const categoryIndex = state
       .getCategoriesNames()
       .findIndex((c) => c === value);
-    console.log(categoryIndex, "categoryIndex");
     if (categoryIndex === -1) {
       setCategoryInputState({
         canAdd: true,

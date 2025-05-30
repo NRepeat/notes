@@ -18,8 +18,13 @@ type Actions = {
   getCategories: () => Composite;
   getNote: (noteName: string) => Component | null;
   deleteNote: (note: string) => void;
-  addNote: (note: string, category?: string[]) => void;
+  addNote: (
+    note: string,
+    category?: string[],
+    tags?: { name: string; color?: string }[]
+  ) => void;
   updateNote: (note: string, value: Component) => void;
+  addTag: (note: string, tag: { name: string; color?: string }) => void;
   addCategory: (
     value: string,
     subCategory?: string,
@@ -38,7 +43,7 @@ const reviver = (key: string, value: any): any => {
     return composite;
   }
   if (value.type === "Leaf") {
-    return new Leaf(value.name || "", value.value || "");
+    return new Leaf(value.name || "", value.value || "", value.tags || []);
   }
   return value;
 };
@@ -59,6 +64,7 @@ const getTagsNames = (
   const tags: { name: string; color: string }[] = [];
   const traverse = (node: Component) => {
     if (!node.isComposite()) {
+      console.log("getTagsNames", node);
       node.getTags().forEach((tag) => {
         if (!tags.some((t) => t.name === tag.name)) {
           tags.push(tag);
@@ -110,6 +116,10 @@ const getSideBarData = (categories: Composite): SideBarData => {
   };
   return categories.getChildren().map((category) => buildItems(category));
 };
+const randomColor = () =>
+  `#${Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, "0")}`;
 export const useBearStore = create<Actions & State>()(
   persist(
     (set, get) => ({
@@ -144,6 +154,20 @@ export const useBearStore = create<Actions & State>()(
       createNoteModalOpen: false,
       getCategories: () => get().categories,
       getSideBarData: () => getSideBarData(get().categories),
+      addTag: (note: string, tag: { name: string; color?: string }) =>
+        set((state) => {
+          const noteToUpdate = state.categories.find(note);
+          if (noteToUpdate) {
+            noteToUpdate.addTag({
+              name: tag.name,
+              color: tag.color ?? randomColor(),
+            });
+          }
+          return {
+            ...state,
+            categories: state.categories,
+          };
+        }),
       addCategory: (
         value: string,
         subCategoryValue?: string | undefined,
@@ -163,9 +187,22 @@ export const useBearStore = create<Actions & State>()(
             categories: state.categories,
           };
         }),
-      addNote: (note: string, category?: string[]) =>
+      addNote: (
+        note: string,
+        category?: string[],
+        tags?: { name: string; color?: string }[]
+      ) =>
         set((state) => {
+          console.log("addNote", note, category, tags);
           const newNote = new Leaf(note);
+          if (tags && Array.isArray(tags)) {
+            tags.forEach((tag) => {
+              newNote.addTag({
+                name: tag.name,
+                color: tag.color || randomColor(),
+              });
+            });
+          }
           if (category && category.length > 0 && category[0] !== "") {
             category.forEach((cat) => {
               const c = state.categories.find(cat);
@@ -211,6 +248,7 @@ export const useBearStore = create<Actions & State>()(
           }
 
           if (value instanceof Component) {
+            console.log("replacer", value.toJSON());
             return value.toJSON();
           }
           return value;

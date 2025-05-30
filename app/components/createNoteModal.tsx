@@ -15,7 +15,11 @@ const CreateNoteModal = () => {
 
   const [formState, setFormState] = useReducer(
     (
-      prevState: { title: string; tag: string; category: string[] },
+      prevState: {
+        title: string;
+        tag: { name: string; color: string }[];
+        category: string[];
+      },
       newState: any
     ) => {
       switch (newState.type) {
@@ -53,9 +57,28 @@ const CreateNoteModal = () => {
 
             return category;
           });
+
           return {
             ...prevState,
             category: newCategoryList,
+          };
+        }
+        case "changeTag": {
+          const newTagList = prevState.tag.map((tag, index) => {
+            if (index === newState.index) {
+              return newState.tag;
+            }
+          });
+          return {
+            ...prevState,
+            tag: newTagList,
+          };
+        }
+        case "addTag": {
+          const newTagList = [...prevState.tag, newState.tag];
+          return {
+            ...prevState,
+            tag: newTagList,
           };
         }
         case "clearCategory": {
@@ -79,7 +102,7 @@ const CreateNoteModal = () => {
     },
     {
       title: "",
-      tag: "",
+      tag: [],
       category: [""],
     }
   );
@@ -88,8 +111,13 @@ const CreateNoteModal = () => {
   };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(formState, "formState.tag");
     if (formState.category) {
       state.addNote(formState.title, formState.category);
+    } else if (formState.category && formState.tag.length > 0) {
+      state.addNote(formState.title, formState.category, formState.tag);
+    } else if (formState.tag.length > 0) {
+      state.addNote(formState.title, [], formState.tag);
     } else {
       state.addNote(formState.title);
     }

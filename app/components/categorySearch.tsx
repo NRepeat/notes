@@ -100,32 +100,6 @@ const CategoryFormSearch = ({
                 <CommandEmpty>
                   <Button variant={"ghost"}>Add new category</Button>
                 </CommandEmpty>
-
-                <CommandGroup>
-                  {state
-                    .getCategoriesNames()
-                    .filter((c) => c !== category)
-                    .map((framework) => (
-                      <CommandItem
-                        key={framework}
-                        value={framework}
-                        onSelect={(currentValue) => {
-                          handleCategoryChange(
-                            currentValue === category ? "" : currentValue
-                          );
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            category === framework ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {framework}
-                      </CommandItem>
-                    ))}
-                </CommandGroup>
               </CommandList>
             </Command>
           </PopoverContent>

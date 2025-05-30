@@ -121,15 +121,20 @@ const CreateNoteModal = () => {
           </div>
           <div className="flex  sm:w-full gap-2 md:flex-row lg:flex-row flex-col">
             <div>
-              <label htmlFor="category">Category</label>
-              {formState.category.map((category: string, index: number) => (
-                <CategoryFormSearch
-                  category={category}
-                  categories={formState.category}
-                  setFormState={setFormState}
-                  index={index}
-                />
-              ))}
+              <label htmlFor="category" className="pb-2 block">
+                Category
+              </label>
+              <div className="flex flex-col gap-2">
+                {formState.category.map((category: string, index: number) => (
+                  <CategoryFormSearch
+                    category={category}
+                    categories={formState.category}
+                    setFormState={setFormState}
+                    index={index}
+                  />
+                ))}
+              </div>
+
               <div className="flex w-full pt-3">
                 <Button
                   onClick={() => setFormState({ type: "addEmptyCategory" })}
@@ -141,7 +146,6 @@ const CreateNoteModal = () => {
                 </Button>
               </div>
             </div>
-
             <TagFormSearch formState={formState} setFormState={setFormState} />
           </div>
           <Button type="submit" className="w-full mt-4">

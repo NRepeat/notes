@@ -6,6 +6,7 @@ export abstract class Component {
   public value!: string | null;
   public name!: string;
   public new!: boolean;
+  public tags: { name: string; color: string }[] = [];
   public setParent(parent: Component | null): void {
     this.parent = parent;
   }
@@ -21,7 +22,20 @@ export abstract class Component {
   public getValue(): string | null {
     return this.value;
   }
-
+  public setTags(tags: { name: string; color: string }[]): void {
+    this.tags = Array.isArray(tags) ? tags : [];
+  }
+  public addTag(tag: { name: string; color: string }): void {
+    if (!this.tags.some((t) => t.name === tag.name)) {
+      this.tags.push(tag);
+    }
+  }
+  public removeTag(tag: { name: string; color: string }): void {
+    this.tags = this.tags.filter((t) => t.name !== tag.name);
+  }
+  public getTags(): { name: string; color: string }[] {
+    return Array.isArray(this.tags) ? this.tags : [];
+  }
   public add(component: Component): void {}
   public updateChildren(component: Component, newComponent: Component): void {}
   public updateName(name: string): void {

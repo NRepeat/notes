@@ -49,10 +49,12 @@ const CategoryFormSearch = ({
       value: "",
     });
   };
+  console.log(state.getCategoriesNames(), "categories");
   const handleCategorySearchChange = (value: string) => {
     const categoryIndex = state
       .getCategoriesNames()
       .findIndex((c) => c === value);
+    console.log(categoryIndex, "categoryIndex");
     if (categoryIndex === -1) {
       setCategoryInputState({
         canAdd: true,
@@ -98,8 +100,30 @@ const CategoryFormSearch = ({
               />
               <CommandList>
                 <CommandEmpty>
-                  <Button variant={"ghost"}>Add new category</Button>
+                  <Button variant={"ghost"} onClick={handleCategoryAdd}>
+                    Add new category
+                  </Button>
                 </CommandEmpty>
+                <CommandGroup>
+                  {state.getCategoriesNames().map((cat) => (
+                    <CommandItem
+                      key={cat}
+                      value={cat}
+                      onSelect={() => {
+                        handleCategoryChange(cat);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          category === cat ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {cat}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
               </CommandList>
             </Command>
           </PopoverContent>

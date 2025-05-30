@@ -14,6 +14,7 @@ type State = {
 
 type Actions = {
   getCategoriesNames: () => string[];
+  getTagsNames: () => { name: string; color: string }[];
   getCategories: () => Composite;
   getNote: (noteName: string) => Component | null;
   deleteNote: (note: string) => void;
@@ -51,6 +52,24 @@ const getCategoriesNames = (categories: Composite): string[] => {
   };
   categories.getChildren().forEach(traverse);
   return names;
+};
+const getTagsNames = (
+  categories: Composite
+): { name: string; color: string }[] => {
+  const tags: { name: string; color: string }[] = [];
+  const traverse = (node: Component) => {
+    if (!node.isComposite()) {
+      node.getTags().forEach((tag) => {
+        if (!tags.some((t) => t.name === tag.name)) {
+          tags.push(tag);
+        }
+      });
+    } else {
+      node.getChildren().forEach(traverse);
+    }
+  };
+  categories.getChildren().forEach(traverse);
+  return tags;
 };
 const getFullCategoryPath = (node: Component): string[] => {
   const path: string[] = [];
@@ -176,6 +195,9 @@ export const useBearStore = create<Actions & State>()(
           };
         }),
       getCategoriesNames: () => getCategoriesNames(get().categories),
+      getTagsNames: () => {
+        return getTagsNames(get().categories);
+      },
     }),
     {
       name: "notes-storage",

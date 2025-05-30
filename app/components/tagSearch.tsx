@@ -43,7 +43,7 @@ const TagFormSearch = ({
     });
   };
   const handleTagSearchChange = (value: string) => {
-    const tagIndex = state.getCategoriesNames().findIndex((c) => c === value);
+    const tagIndex = state.getTagsNames().findIndex((c) => c.name === value);
     if (tagIndex === -1) {
       setTagInputState({
         canAdd: true,
@@ -93,10 +93,10 @@ const TagFormSearch = ({
                   <Button variant={"ghost"}>Add new tag</Button>
                 </CommandEmpty>
                 <CommandGroup>
-                  {state.getCategoriesNames().map((framework) => (
+                  {state.getTagsNames().map((framework) => (
                     <CommandItem
-                      key={framework}
-                      value={framework}
+                      key={framework.name}
+                      value={framework.name}
                       onSelect={(currentValue) => {
                         handleTagChange(
                           currentValue === formState.tag ? "" : currentValue
@@ -112,7 +112,7 @@ const TagFormSearch = ({
                             : "opacity-0"
                         )}
                       />
-                      {framework}
+                      {framework.name}
                     </CommandItem>
                   ))}
                 </CommandGroup>

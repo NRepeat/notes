@@ -3,13 +3,14 @@ import { Component } from "~/types";
 export class Leaf extends Component {
   public name: string;
   public value: string | null = null;
-  public tags: string[] = [];
-
+  public tags: { name: string; color: string }[] = [];
   constructor(name: string, value?: string, tags?: string[]) {
     super();
     this.name = name;
     this.value = value || "";
-    this.tags = tags ?? [];
+    this.tags = Array.isArray(tags)
+      ? tags.map((tag) => ({ name: tag, color: "default" }))
+      : [];
   }
   public updateName(name: string): void {
     this.name = name;
@@ -20,16 +21,18 @@ export class Leaf extends Component {
   public getValue(): string | null {
     return this.value;
   }
-  public setTags(tags: string[]): void {
+  public setTags(tags: { name: string; color: string }[]): void {
     this.tags = Array.isArray(tags) ? tags : [];
   }
-  public addTag(tag: string): void {
-    if (!this.tags.includes(tag)) this.tags.push(tag);
+  public addTag(tag: { name: string; color: string }): void {
+    if (!this.tags.some((t) => t.name === tag.name)) {
+      this.tags.push(tag);
+    }
   }
-  public removeTag(tag: string): void {
-    this.tags = this.tags.filter((t) => t !== tag);
+  public removeTag(tag: { name: string; color: string }): void {
+    this.tags = this.tags.filter((t) => t.name !== tag.name);
   }
-  public getTags(): string[] {
+  public getTags(): { name: string; color: string }[] {
     return Array.isArray(this.tags) ? this.tags : [];
   }
   public operation(): string {

@@ -15,21 +15,18 @@ const mkdStr = `
 
 `;
 export default function Component({ params }: Route.ComponentProps) {
-  // params["*"] будет содержать строку вида "dd/n/лолофвы" или "dd/New Folder/n/лолофвы"
   const path = params["*"] || "";
   const parts = path.split("/");
-  // Ищем индекс "n" (разделитель между папками и заметкой)
   const nIndex = parts.lastIndexOf("n");
   let categoryPath: string[] = [];
   let noteName: string | undefined;
   if (nIndex !== -1) {
-    categoryPath = parts.slice(0, nIndex); // все до "n" — это путь до папки
-    noteName = parts.slice(nIndex + 1).join("/"); // всё после "n" — имя заметки
+    categoryPath = parts.slice(0, nIndex);
+    noteName = parts.slice(nIndex + 1).join("/");
   }
   const getNote = useBearStore((state) => state.getNote);
   const updateNote = useBearStore((state) => state.updateNote);
 
-  // Находим заметку по вложенному пути
   let note: NoteComponent | null = null;
   if (categoryPath.length > 0) {
     const state = useBearStore.getState();
@@ -89,8 +86,29 @@ export default function Component({ params }: Route.ComponentProps) {
   useEffect(() => {
     handleSaveNoteValue(value);
   }, [value]);
+  console.log(note, "note");
+  const getTagsWithCollor = () => {
+    if (note) {
+      return note?.getTags().length > 0
+        ? note.getTags().map((tag) => {
+            return (
+              <span
+                key={tag.name}
+                className={`inline-block px-2 py-1 mr-2 text-xs font-semibold text-white rounded-full`}
+                style={{ backgroundColor: tag.color || "gray" }}
+              >
+                {tag.name}
+              </span>
+            );
+          })
+        : null;
+    }
+  };
   return (
     <div className="h-full">
+      <div className="flex items-center justify-between p-2 border-b">
+        {getTagsWithCollor()}
+      </div>
       <MDEditor
         height={"100%"}
         value={value}
